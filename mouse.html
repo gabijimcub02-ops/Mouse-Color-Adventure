@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mouse Color Adventure</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Comic Sans MS","Trebuchet MS",sans-serif;
+  background:linear-gradient(#bfeaff,#fff4c4);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+}
+
+.game{
+  width:min(1000px,100%);
+  min-height:680px;
+  background:#fffdf5;
+  border:6px solid #56371f;
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:0 15px 35px rgba(0,0,0,.22);
+  position:relative;
+}
+
+/* HEADER */
+
+header{
+  background:#ffd84d;
+  border-bottom:5px solid #56371f;
+  padding:15px;
+  text-align:center;
+}
+
+header h1{
+  margin:0;
+  color:#49301d;
+  font-size:clamp(30px,5vw,50px);
+}
+
+header p{
+  margin:5px 0 0;
+  font-size:20px;
+  color:#60462e;
+}
+
+/* SCREENS */
+
+.screen{
+  padding:20px 30px 35px;
+  text-align:center;
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* START SCREEN */
+
+.start-content{
+  min-height:520px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.start-content h2{
+  font-size:38px;
+  margin:10px;
+  color:#49301d;
+}
+
+.start-content p{
+  max-width:650px;
+  font-size:24px;
+  line-height:1.4;
+}
+
+.mouse-row{
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap:15px;
+  margin:20px;
+  flex-wrap:wrap;
+}
+
+.mouse-row img{
+  width:140px;
+  max-height:150px;
+  object-fit:contain;
+  transition:.3s;
+}
+
+.mouse-row img:hover{
+  transform:translateY(-10px) rotate(-3deg);
+}
+
+/* BUTTONS */
+
+.main-btn{
+  border:4px solid #3c2b1d;
+  border-radius:22px;
+  padding:15px 35px;
+  font-family:inherit;
+  font-size:25px;
+  font-weight:bold;
+  background:#73d658;
+  color:#203319;
+  cursor:pointer;
+  box-shadow:0 6px 0 #37872c;
+  transition:.1s;
+}
+
+.main-btn:hover{
+  transform:scale(1.04);
+}
+
+.main-btn:active{
+  transform:translateY(5px);
+  box-shadow:0 1px 0 #37872c;
+}
+
+/* PROGRESS */
+
+.progress{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  padding:8px;
+}
+
+.star{
+  font-size:35px;
+  filter:grayscale(1);
+  opacity:.35;
+  transition:.4s;
+}
+
+.star.done{
+  filter:none;
+  opacity:1;
+  animation:pop .5s;
+}
+
+@keyframes pop{
+  50%{
+    transform:scale(1.5) rotate(15deg);
+  }
+}
+
+/* LEVEL */
+
+.level-number{
+  font-size:18px;
+  color:#876b52;
+  margin:4px;
+}
+
+.level-title{
+  font-size:34px;
+  color:#49301d;
+  margin:5px;
+}
+
+.instruction{
+  font-size:25px;
+  min-height:65px;
+  max-width:750px;
+  margin:10px auto;
+  line-height:1.3;
+}
+
+/* MOUSE DISPLAY */
+
+.mouse-stage{
+  height:210px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.game-mouse{
+  max-width:210px;
+  max-height:190px;
+  object-fit:contain;
+  transition:.5s;
+}
+
+.mouse-jump{
+  animation:mouseJump .7s;
+}
+
+@keyframes mouseJump{
+
+  0%{
+    transform:translateY(0) rotate(0);
+  }
+
+  35%{
+    transform:translateY(-45px) rotate(-8deg);
+  }
+
+  70%{
+    transform:translateY(0) rotate(5deg);
+  }
+
+  100%{
+    transform:translateY(0) rotate(0);
+  }
+}
+
+/* PAINT OPTIONS */
+
+.paint-options{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:25px;
+  margin-top:5px;
+}
+
+.paint-card{
+  width:135px;
+  cursor:pointer;
+  transition:.2s;
+  user-select:none;
+}
+
+.paint-card:hover{
+  transform:scale(1.08);
+}
+
+.paint-card:active{
+  transform:scale(.95);
+}
+
+.puddle{
+  width:125px;
+  height:90px;
+  border:5px solid #333;
+  border-radius:55% 45% 60% 40%;
+  position:relative;
+  box-shadow:inset 0 -10px 0 rgba(0,0,0,.08);
+}
+
+.puddle::before{
+  content:"";
+  position:absolute;
+  width:35px;
+  height:25px;
+  background:inherit;
+  border:4px solid #333;
+  border-radius:50%;
+  top:-18px;
+  left:12px;
+}
+
+.paint-name{
+  display:inline-block;
+  background:white;
+  border:3px solid #333;
+  border-radius:15px;
+  padding:5px 12px;
+  margin-top:-5px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.red{background:#e5232d;}
+.blue{background:#2878d4;}
+.yellow{background:#ffd52a;}
+.orange{background:#ff8b27;}
+.green{background:#4dbd4c;}
+.purple{background:#9b4cc5;}
+
+/* MIXING COLORS */
+
+.mix-example{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  font-size:35px;
+  margin:5px;
+}
+
+.small-color{
+  width:45px;
+  height:45px;
+  border:4px solid #333;
+  border-radius:50%;
+}
+
+/* FEEDBACK */
+
+.feedback{
+  min-height:60px;
+  margin:22px 0 8px;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.correct{
+  color:#238b35;
+  animation:pop .5s;
+}
+
+.wrong{
+  color:#e27618;
+  animation:shake .4s;
+}
+
+@keyframes shake{
+
+  25%{
+    transform:translateX(-10px);
+  }
+
+  50%{
+    transform:translateX(10px);
+  }
+
+  75%{
+    transform:translateX(-6px);
+  }
+
+}
+
+/* END */
+
+.end{
+  min-height:520px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.end h2{
+  font-size:45px;
+  margin:10px;
+  color:#49301d;
+}
+
+.end p{
+  font-size:25px;
+}
+
+.big-stars{
+  font-size:55px;
+  animation:pop 1s infinite;
+}
+
+.color-summary{
+  font-size:23px;
+  line-height:2;
+  margin:10px;
+}
+
+/* CONFETTI */
+
+.confetti{
+  position:absolute;
+  width:12px;
+  height:12px;
+  top:-20px;
+  animation:fall 3s linear forwards;
+  z-index:50;
+}
+
+@keyframes fall{
+
+  to{
+    transform:translateY(750px) rotate(700deg);
+  }
+
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  .screen{
+    padding:15px 10px 25px;
+  }
+
+  .mouse-row img{
+    width:95px;
+  }
+
+  .game-mouse{
+    max-width:160px;
+  }
+
+  .mouse-stage{
+    height:175px;
+  }
+
+  .paint-card{
+    width:100px;
+  }
+
+  .puddle{
+    width:95px;
+    height:70px;
+  }
+
+  .instruction{
+    font-size:21px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game" id="game">
+
+<header>
+
+<h1>🐭 Mouse Color Adventure 🎨</h1>
+
+<p>Let's discover the magic of colors!</p>
+
+</header>
+
+
+<!-- START SCREEN -->
+
+<div id="startScreen" class="screen">
+
+<div class="start-content">
+
+<h2>Welcome, little artist!</h2>
+
+<p>
+The mice found colorful paint!
+Help them explore the colors and discover
+what happens when we mix them.
+</p>
+
+<div class="mouse-row">
+
+<img
+src="https://i.postimg.cc/t1JFmVqP/Diseno-sin-titulo.png"
+alt="Mouse 1">
+
+<img
+src="https://i.postimg.cc/7ChSQTHz/Diseno-sin-titulo-(1).png"
+alt="Mouse 2">
+
+<img
+src="https://i.postimg.cc/d73GSTs7/Diseno-sin-titulo-(2).png"
+alt="Mouse 3">
+
+<img
+src="https://i.postimg.cc/FYDjZx4Y/Diseno-sin-titulo-(3).png"
+alt="Mouse 4">
+
+</div>
+
+<button class="main-btn" onclick="startGame()">
+▶ START ADVENTURE
+</button>
+
+</div>
+
+</div>
+
+
+<!-- GAME SCREEN -->
+
+<div id="gameScreen" class="screen hidden">
+
+<div class="progress">
+
+<span class="star" id="star0">⭐</span>
+<span class="star" id="star1">⭐</span>
+<span class="star" id="star2">⭐</span>
+<span class="star" id="star3">⭐</span>
+<span class="star" id="star4">⭐</span>
+<span class="star" id="star5">⭐</span>
+
+</div>
+
+<div class="level-number" id="levelNumber"></div>
+
+<h2 class="level-title" id="levelTitle"></h2>
+
+<div class="instruction" id="instruction"></div>
+
+<div id="mixExample" class="mix-example"></div>
+
+<div class="mouse-stage">
+
+<img
+id="gameMouse"
+class="game-mouse"
+src="https://i.postimg.cc/t1JFmVqP/Diseno-sin-titulo.png"
+alt="Mouse">
+
+</div>
+
+<div id="paintOptions" class="paint-options"></div>
+
+<div id="feedback" class="feedback"></div>
+
+<button
+id="nextButton"
+class="main-btn hidden"
+onclick="nextLevel()">
+NEXT ADVENTURE ➜
+</button>
+
+</div>
+
+
+<!-- END SCREEN -->
+
+<div id="endScreen" class="screen hidden">
+
+<div class="end">
+
+<div class="big-stars">
+⭐ 🎨 ⭐
+</div>
+
+<h2>Great job!</h2>
+
+<p>
+You helped the mice discover the magic of colors!
+</p>
+
+<div class="mouse-row">
+
+<img
+src="https://i.postimg.cc/t1JFmVqP/Diseno-sin-titulo.png"
+alt="Mouse">
+
+<img
+src="https://i.postimg.cc/7ChSQTHz/Diseno-sin-titulo-(1).png"
+alt="Mouse">
+
+<img
+src="https://i.postimg.cc/d73GSTs7/Diseno-sin-titulo-(2).png"
+alt="Mouse">
+
+<img
+src="https://i.postimg.cc/FYDjZx4Y/Diseno-sin-titulo-(3).png"
+alt="Mouse">
+
+</div>
+
+<div class="color-summary">
+
+🔴 RED + 🟡 YELLOW = 🟠 ORANGE
+
+<br>
+
+🟡 YELLOW + 🔵 BLUE = 🟢 GREEN
+
+<br>
+
+🔴 RED + 🔵 BLUE = 🟣 PURPLE
+
+</div>
+
+<button class="main-btn" onclick="restartGame()">
+↻ PLAY AGAIN
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ========================================
+   EXACT MOUSE IMAGE URLS
+======================================== */
+
+const mouseImages = [
+
+"https://i.postimg.cc/t1JFmVqP/Diseno-sin-titulo.png",
+
+"https://i.postimg.cc/7ChSQTHz/Diseno-sin-titulo-(1).png",
+
+"https://i.postimg.cc/d73GSTs7/Diseno-sin-titulo-(2).png",
+
+"https://i.postimg.cc/FYDjZx4Y/Diseno-sin-titulo-(3).png"
+
+];
+
+
+/* ========================================
+   LEVELS
+======================================== */
+
+const levels = [
+
+{
+title:"Find Red!",
+instruction:"The mouse found three paint puddles. Can you find RED?",
+options:["blue","yellow","red"],
+answer:"red",
+message:"Yes! You found RED! ❤️",
+mouse:0
+},
+
+{
+title:"Find Blue!",
+instruction:"Great! Now, can you find the BLUE paint?",
+options:["red","blue","yellow"],
+answer:"blue",
+message:"Wonderful! This is BLUE! 💙",
+mouse:1
+},
+
+{
+title:"Find Yellow!",
+instruction:"Find the bright YELLOW paint, like the sun!",
+options:["yellow","blue","red"],
+answer:"yellow",
+message:"You got it! This is YELLOW! 💛",
+mouse:2
+},
+
+{
+title:"Mix the Colors!",
+instruction:"RED and YELLOW are mixing! What new color do they make?",
+options:["green","orange","purple"],
+answer:"orange",
+message:"Amazing! RED + YELLOW = ORANGE! 🧡",
+mouse:0,
+mix:["red","yellow"]
+},
+
+{
+title:"Mix Again!",
+instruction:"YELLOW and BLUE are mixing! What color will appear?",
+options:["purple","green","orange"],
+answer:"green",
+message:"Fantastic! YELLOW + BLUE = GREEN! 💚",
+mouse:1,
+mix:["yellow","blue"]
+},
+
+{
+title:"Final Color Challenge!",
+instruction:"RED and BLUE jump into the paint! What color do they make?",
+options:["orange","purple","green"],
+answer:"purple",
+message:"Hooray! RED + BLUE = PURPLE! 💜",
+mouse:3,
+mix:["red","blue"]
+}
+
+];
+
+let currentLevel = 0;
+let answered = false;
+
+
+/* ========================================
+   START
+======================================== */
+
+function startGame(){
+
+document
+.getElementById("startScreen")
+.classList.add("hidden");
+
+document
+.getElementById("gameScreen")
+.classList.remove("hidden");
+
+playSound("start");
+
+loadLevel();
+
+}
+
+
+/* ========================================
+   LOAD LEVEL
+======================================== */
+
+function loadLevel(){
+
+answered = false;
+
+const level = levels[currentLevel];
+
+document.getElementById("levelNumber").textContent =
+"Adventure " + (currentLevel + 1) + " of " + levels.length;
+
+document.getElementById("levelTitle").textContent =
+level.title;
+
+document.getElementById("instruction").textContent =
+level.instruction;
+
+const mouse =
+document.getElementById("gameMouse");
+
+mouse.src = mouseImages[level.mouse];
+
+mouse.classList.remove("mouse-jump");
+
+const feedback =
+document.getElementById("feedback");
+
+feedback.textContent = "";
+feedback.className = "feedback";
+
+document
+.getElementById("nextButton")
+.classList.add("hidden");
+
+
+/* COLOR MIX VISUAL */
+
+const mix =
+document.getElementById("mixExample");
+
+mix.innerHTML = "";
+
+if(level.mix){
+
+mix.innerHTML = `
+
+<div class="small-color ${level.mix[0]}"></div>
+
+<span>+</span>
+
+<div class="small-color ${level.mix[1]}"></div>
+
+<span>=</span>
+
+<span>❓</span>
+
+`;
+
+}
+
+
+/* PAINT OPTIONS */
+
+const options =
+document.getElementById("paintOptions");
+
+options.innerHTML = "";
+
+level.options.forEach(color=>{
+
+const card =
+document.createElement("div");
+
+card.className = "paint-card";
+
+card.innerHTML = `
+
+<div class="puddle ${color}"></div>
+
+<div class="paint-name">
+${color.toUpperCase()}
+</div>
+
+`;
+
+card.onclick =
+()=>checkAnswer(color);
+
+options.appendChild(card);
+
+});
+
+}
+
+
+/* ========================================
+   CHECK ANSWER
+======================================== */
+
+function checkAnswer(color){
+
+if(answered) return;
+
+const level =
+levels[currentLevel];
+
+const feedback =
+document.getElementById("feedback");
+
+if(color === level.answer){
+
+answered = true;
+
+feedback.textContent =
+"⭐ " + level.message;
+
+feedback.className =
+"feedback correct";
+
+document
+.getElementById("star"+currentLevel)
+.classList.add("done");
+
+const mouse =
+document.getElementById("gameMouse");
+
+mouse.classList.remove("mouse-jump");
+
+void mouse.offsetWidth;
+
+mouse.classList.add("mouse-jump");
+
+playSound("correct");
+
+createMiniConfetti();
+
+setTimeout(()=>{
+
+document
+.getElementById("nextButton")
+.classList.remove("hidden");
+
+},500);
+
+}
+
+else{
+
+feedback.textContent =
+"Oops! 🐭 Try another color!";
+
+feedback.className =
+"feedback wrong";
+
+playSound("wrong");
+
+setTimeout(()=>{
+
+feedback.className =
+"feedback";
+
+},500);
+
+}
+
+}
+
+
+/* ========================================
+   NEXT LEVEL
+======================================== */
+
+function nextLevel(){
+
+currentLevel++;
+
+if(currentLevel >= levels.length){
+
+showEnd();
+
+}else{
+
+loadLevel();
+
+}
+
+}
+
+
+/* ========================================
+   END
+======================================== */
+
+function showEnd(){
+
+document
+.getElementById("gameScreen")
+.classList.add("hidden");
+
+document
+.getElementById("endScreen")
+.classList.remove("hidden");
+
+playSound("finish");
+
+createConfetti();
+
+}
+
+
+/* ========================================
+   RESTART
+======================================== */
+
+function restartGame(){
+
+currentLevel = 0;
+
+document.querySelectorAll(".star")
+.forEach(star=>{
+star.classList.remove("done");
+});
+
+document
+.getElementById("endScreen")
+.classList.add("hidden");
+
+document
+.getElementById("gameScreen")
+.classList.remove("hidden");
+
+loadLevel();
+
+}
+
+
+/* ========================================
+   SIMPLE SOUND EFFECTS
+======================================== */
+
+function playSound(type){
+
+try{
+
+const audio =
+new (window.AudioContext ||
+window.webkitAudioContext)();
+
+const oscillator =
+audio.createOscillator();
+
+const gain =
+audio.createGain();
+
+oscillator.connect(gain);
+gain.connect(audio.destination);
+
+if(type==="correct"){
+
+oscillator.frequency.setValueAtTime(
+500,
+audio.currentTime
+);
+
+oscillator.frequency.exponentialRampToValueAtTime(
+900,
+audio.currentTime+.25
+);
+
+}
+
+else if(type==="wrong"){
+
+oscillator.frequency.setValueAtTime(
+250,
+audio.currentTime
+);
+
+oscillator.frequency.exponentialRampToValueAtTime(
+170,
+audio.currentTime+.25
+);
+
+}
+
+else if(type==="finish"){
+
+oscillator.frequency.setValueAtTime(
+500,
+audio.currentTime
+);
+
+oscillator.frequency.exponentialRampToValueAtTime(
+1100,
+audio.currentTime+.5
+);
+
+}
+
+else{
+
+oscillator.frequency.setValueAtTime(
+400,
+audio.currentTime
+);
+
+oscillator.frequency.exponentialRampToValueAtTime(
+700,
+audio.currentTime+.2
+);
+
+}
+
+gain.gain.setValueAtTime(
+.12,
+audio.currentTime
+);
+
+gain.gain.exponentialRampToValueAtTime(
+.001,
+audio.currentTime+.5
+);
+
+oscillator.start();
+
+oscillator.stop(
+audio.currentTime+.5
+);
+
+}catch(e){}
+
+}
+
+
+/* ========================================
+   CONFETTI
+======================================== */
+
+function createMiniConfetti(){
+
+for(let i=0;i<18;i++){
+
+createConfettiPiece();
+
+}
+
+}
+
+function createConfetti(){
+
+for(let i=0;i<70;i++){
+
+setTimeout(()=>{
+
+createConfettiPiece();
+
+},i*20);
+
+}
+
+}
+
+function createConfettiPiece(){
+
+const game =
+document.getElementById("game");
+
+const piece =
+document.createElement("div");
+
+piece.className =
+"confetti";
+
+const colors = [
+"#ff4040",
+"#ffd93d",
+"#4caf50",
+"#4285f4",
+"#a855d1",
+"#ff8b27"
+];
+
+piece.style.background =
+colors[
+Math.floor(
+Math.random()*colors.length
+)
+];
+
+piece.style.left =
+Math.random()*100+"%";
+
+piece.style.animationDuration =
+(2+Math.random()*2)+"s";
+
+piece.style.borderRadius =
+Math.random()>.5
+?"50%"
+:"2px";
+
+game.appendChild(piece);
+
+setTimeout(()=>{
+
+piece.remove();
+
+},4000);
+
+}
+
+</script>
+
+</body>
+</html>
